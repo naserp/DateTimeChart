@@ -1,0 +1,49 @@
+﻿<html>
+<head>
+    <title>DateTimeChart d3</title>
+    
+    <style type="text/css" media="screen">
+        text {font-family: Arial;font-size: 9pt;}
+    </style>
+    
+    <link href="Style.css" rel="stylesheet" type="text/css" />
+    <script src="d3.js" type="text/javascript"></script>
+    <script src="DateTimeChart.js" type="text/javascript"></script>    
+</head>
+<body>
+
+    <script type="text/javascript" charset="utf-8">
+        var data = [3, 6, 2, 7, 5, 9, 2, 8, 3, 9, 4, 10, 5, 8, 1, 8, 3, 10, 1, 6, 2, 4, 1, 8, 3, 5, 0, 6, 2, 10, 7];
+
+        var chart = new DateTimeChart(980, 300, 25, 20,30,26);
+        chart.setData(data);
+
+    </script>
+
+    <br/>
+    <br/>
+    <table width="980" >
+        <tr>
+            <td style="width: 100%">
+                &nbsp;
+            </td>
+            <td class="buttons" nowrap="nowrap">
+                <button type="button" class="positive" onclick="alert('Callback for Today')">
+                    Today
+                </button>    
+            </td>
+            <td class="buttons" nowrap="nowrap">
+                <button type="button" class="positive" onclick="alert('Callback for 7days')">
+                    7 days
+                </button>             
+            </td>
+            <td class="buttons" nowrap="nowrap">
+                <button type="button" class="positive" onclick="alert('Callback for 30days')">
+                    30 days
+                </button>            
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
