@@ -13,9 +13,9 @@
 <body>
 
     <script type="text/javascript" charset="utf-8">
-        var data = [3, 6, 2, 7, 5, 9, 2, 8, 3, 9, 4, 10, 5, 8, 1, 8, 3, 10, 1, 6, 2, 4, 1, 8, 3, 5, 0, 6, 2, 10, 7];
+        var data = [3, 6, 2, 7, 5, 9, 2, 8, 3, 9, 4.5, 10, 5, 8, 1, 8, 3, 10, 1, 6, 2, 4, 1, 8, 3, 5, 0, 6, 8, 10, 7];
 
-        var chart = new DateTimeChart(980, 300, 25, 20,30,26);
+        var chart = new DateTimeChart(980, 300, 30, 25,10);
         chart.setData(data);
 
     </script>
@@ -28,18 +28,18 @@
                 &nbsp;
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="alert('Callback for Today')">
-                    Today
+                <button type="button" class="positive" onclick="alert('Callback for Day')">
+                    Day
                 </button>    
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="alert('Callback for 7days')">
-                    7 days
+                <button type="button" class="positive" onclick="alert('Callback for Month')">
+                    Month
                 </button>             
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="alert('Callback for 30days')">
-                    30 days
+                <button type="button" class="positive" onclick="alert('Callback for Year')">
+                    Year
                 </button>            
             </td>
         </tr>
