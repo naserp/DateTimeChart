@@ -1,4 +1,6 @@
-﻿<html>
+﻿<!DOCTYPE html">
+
+<html>
 <head>
     <title>DateTimeChart d3</title>
     
@@ -12,38 +14,36 @@
 </head>
 <body>
 
-    <script type="text/javascript" charset="utf-8">
-        var data = [3, 6, 2, 7, 5, 9, 2, 8, 3, 9, 4.5, 10, 5, 8, 1, 8, 3, 10, 1, 6, 2, 4, 1, 8, 3, 5, 0, 6, 8, 10, 7];
-
-        var chart = new DateTimeChart(980, 300, 30, 25,10);
-        chart.setData(data);
-
-    </script>
-
-    <br/>
-    <br/>
     <table width="980" >
         <tr>
             <td style="width: 100%">
                 &nbsp;
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="alert('Callback for Day')">
+                <button type="button" class="positive" onclick="chart.setDataDay(dataDay);">
                     Day
                 </button>    
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="alert('Callback for Month')">
+                <button type="button" class="positive" onclick="chart.setDataMonth(dataMonth);">
                     Month
                 </button>             
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="alert('Callback for Year')">
+                <button type="button" class="positive" onclick=" chart.setDataYear(dataYear);">
                     Year
                 </button>            
             </td>
         </tr>
     </table>
+
+    <script type="text/javascript" charset="utf-8">
+        var dataDay = [1, 5, 3, 8, 6, 2, 10, 3, 7, 4, 9, 1, 8, 6, 9, 2, 6, 5, 9, 2, 8, 0, 3, 2];
+        var dataMonth = [3, 6, 2, 7, 5, 9, 2, 8, 3, 9, 4.5, 10, 5, 8, 1, 8, 3, 10, 1, 6, 2, 4, 1, 8, 3, 5, 0, 6, 8, 10, 7];
+        var dataYear = [3, 9, 1, 5, 2, 8, 0, 6, 1, 10, 3, 7];
+        
+        var chart = new DateTimeChart(980, 300, 30, 25,10);
+    </script>
 
 </body>
 </html>
