@@ -20,17 +20,17 @@
                 &nbsp;
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="chart.setDataDay(dataDay);">
+                <button type="button" class="positive" onclick="chart.setDataDay(dataDayOriginal);">
                     Day
                 </button>    
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="chart.setDataMonth(dataMonth);">
+                <button type="button" class="positive" onclick="chart.setDataMonth(dataMonthOriginal);">
                     Month
                 </button>             
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick=" chart.setDataYear(dataYear);">
+                <button type="button" class="positive" onclick=" chart.setDataYear(dataYearOriginal);">
                     Year
                 </button>            
             </td>
@@ -38,11 +38,31 @@
     </table>
 
     <script type="text/javascript" charset="utf-8">
-        var dataDay = [1, 5, 3, 8, 6, 2, 10, 3, 7, 4, 9, 1, 8, 6, 9, 2, 6, 5, 9, 2, 8, 0, 3, 2];
-        var dataMonth = [3, 6, 2, 7, 5, 9, 2, 8, 3, 9, 4.5, 10, 5, 8, 1, 8, 3, 10, 1, 6, 2, 4, 1, 8, 3, 5, 0, 6, 8, 10, 7];
-        var dataYear = [3, 9, 1, 5, 2, 8, 0, 6, 1, 10, 3, 7];
+    
+      if(/msie/i.test(navigator.userAgent)) {
+        alert("Sorry, Internet Explorer is not supported, please get a modern browser like Chrome of Firefox");
+      }
+      else {
+      	debugger;
+        var dataDayOriginal = new Array();
+        randomGen(dataDayOriginal, 24);
+        var dataMonthOriginal = new Array();
+        randomGen(dataMonthOriginal,31);
+      	var dataYearOriginal= new Array();
+      	randomGen(dataYearOriginal, 12);
         
         var chart = new DateTimeChart(980, 300, 30, 25,10);
+      	chart.setDataYear(dataYearOriginal);
+      }
+      
+      function randomGen(array , count) {
+      	for(var i=0;i<count;i++) {
+      		array[i] = Math.floor(Math.random() * 11);
+      	};
+      	array[2] = 10;
+      	array[8] = 0;
+      }
+          
     </script>
 
 </body>
