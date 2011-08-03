@@ -18,29 +18,30 @@
 		var y = d3.scale.linear().domain([0, d3.max(this.data)]).range([0 + this.marginY, this.h - this.marginY]);
         var x = d3.scale.linear().domain([0, this.data.length-1]).range([0 + this.marginX, this.w - this.marginX]);
 		this.intervalX = (x(this.data.length-1)-this.marginX)/(this.data.length-1);
-    	this.intervalY = y(d3.max(this.data))/(tricky+1);
+		this.intervalY = (y(d3.max(this.data))-this.marginY)/(tricky);
 		var percent = d3.scale.linear().domain([0, d3.max(this.data)]).range([0, 100]);
         var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("cardinal");
 
     	g.append("svg:rect").attr("x", 0).attr("y", -1 * this.h).attr("width", this.w).attr("height", this.h).attr("fill","white");
 
-        for (var j = 0; j < 11; j++) {
+        for (var j = 0; j < 11; j+=2) {
             g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j).attr("x2", x(this.data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
-        	g.append("svg:text").attr("class","yLabel").text(j*10).attr("x",0).attr("y", -1 * (this.intervalY * j) - marginy ).attr("text-anchor", "right").attr("dy", 3);
+        	g.append("svg:text").attr("class","yLabel").text(j*10 + "%").attr("x",0 + Math.ceil((10-j)/9)*7).attr("y", -1 * (this.intervalY * j) - marginy ).attr("text-anchor", "right").attr("dy", 3);
         }
 	    g.append("svg:text").attr("class","yLabel").text("%").attr("x",7).attr("y", -1 * (this.intervalY * j) - marginy +7 ).attr("text-anchor", "right").attr("dy", 3);
     	
 		g.append("svg:path").attr("d", line(this.data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
-        g.append("svg:line").attr("x1", x(0)).attr("y1", (-1 * y(0))).attr("x2", x(this.w)).attr("y2", (-1 * y(0))).attr("stroke", "#000").attr("stroke-width", 2);
-        g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0)).attr("x2", x(0)).attr("y2", -1 * y(d3.max(this.data))-marginy).attr("stroke", "#000").attr("stroke-width", 2);
+        //g.append("svg:line").attr("x1", x(0)).attr("y1", (-1 * y(0))).attr("x2", x(this.w)).attr("y2", (-1 * y(0))).attr("stroke", "#000").attr("stroke-width", 2);
+        //g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0)).attr("x2", x(0)).attr("y2", -1 * y(d3.max(this.data))-marginy).attr("stroke", "#000").attr("stroke-width", 2);
 
 		for (var i = 0; i < 12; i++) {
 	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0)).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(d3.max(this.data))).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);
         }
         for (var i = 0; i < 12; i++) {
         	var positionX = (Math.round((marginx + this.intervalX * i) * 100)) / 100;
-	        g.append("svg:text").attr("class", "xLabel").text(months[i]).attr("x", positionX).attr("y", -5).attr("text-anchor", "middle");
-	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * this.data[i])-this.marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ this.data[i] +" hits  - "+ (percent(this.data[i])+0) +"%', 100);").attr('onmouseout',"tooltip.hide();");
+        	var tempPercent = (Math.round(percent(this.data[i]) * 100) / 100);
+	        g.append("svg:text").attr("class", "xLabel").text(months[i]).attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
+	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * this.data[i])-this.marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ this.data[i] +" hits  - "+ tempPercent +"%', 100);").attr('onmouseout',"tooltip.hide();");
         }
 	};	
 	
@@ -53,29 +54,31 @@
 		var y = d3.scale.linear().domain([0, d3.max(this.data)]).range([0 + this.marginY, this.h - this.marginY]);
         var x = d3.scale.linear().domain([0, this.data.length-1]).range([0 + this.marginX, this.w - this.marginX]);
 		this.intervalX = (x(this.data.length-1)-this.marginX)/(this.data.length-1);
-		this.intervalY = y(d3.max(this.data))/(tricky+1);
+		this.intervalY = (y(d3.max(this.data))-this.marginY)/(tricky);
 		var percent = d3.scale.linear().domain([0, d3.max(this.data)]).range([0, 100]);
         var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("cardinal");
         
 		g.append("svg:rect").attr("x", 0).attr("y", -1 * this.h).attr("width", this.w).attr("height", this.h).attr("fill","white");
 		
-        for (var j = 0; j < 11; j++) {
+        for (var j = 0; j < 11; j+=2) {
             g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j).attr("x2", x(this.data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
-        	g.append("svg:text").attr("class","yLabel").text(j*10).attr("x",0).attr("y", -1 * (this.intervalY * j) - marginy ).attr("text-anchor", "right").attr("dy", 3);
+        	g.append("svg:text").attr("class","yLabel").text(j*10 + "%").attr("x",0+ Math.ceil((10-j)/9)*7).attr("y", -1 * (this.intervalY * j) - marginy ).attr("text-anchor", "right").attr("dy", 3);
         }
 	
 		g.append("svg:path").attr("d", line(this.data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
-        g.append("svg:line").attr("x1", x(0)).attr("y1", (-1 * y(0))).attr("x2", x(this.w)).attr("y2", (-1 * y(0))).attr("stroke", "#000").attr("stroke-width", 2);
-        g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0)).attr("x2", x(0)).attr("y2", -1 * y(d3.max(this.data))-marginy).attr("stroke", "#000").attr("stroke-width", 2);
+        //g.append("svg:line").attr("x1", x(0)).attr("y1", (-1 * y(0))).attr("x2", x(this.w)).attr("y2", (-1 * y(0))).attr("stroke", "#000").attr("stroke-width", 2);
+        //g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0)).attr("x2", x(0)).attr("y2", -1 * y(d3.max(this.data))-marginy).attr("stroke", "#000").attr("stroke-width", 2);
 
 		for (var i = 0; i < 31; i+=3) {
+            var positionX = (Math.round((marginx + this.intervalX * i) * 100)) / 100;
 	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0)).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(d3.max(this.data))).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);
+        	g.append("svg:text").attr("class", "xLabel").text(i+1).attr("x", positionX).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
         }
 	
         for (var i = 0; i < 31; i++) {
 	        var positionX = (Math.round((marginx + this.intervalX * i) * 100)) / 100;
-        	g.append("svg:text").attr("class", "xLabel").text(i+1).attr("x", positionX).attr("y", -5).attr("text-anchor", "middle");
-	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * this.data[i])-this.marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ this.data[i] +" hits  - "+ (percent(this.data[i])+0) +"%', 100);").attr('onmouseout',"tooltip.hide();");
+        	var tempPercent = (Math.round(percent(this.data[i]) * 100) / 100);
+	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * this.data[i])-this.marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ this.data[i] +" hits  - "+ (tempPercent) +"%', 100);").attr('onmouseout',"tooltip.hide();");
         }
 
 	};
@@ -86,32 +89,34 @@
 	};
 
 	this.paintDay = function() {
-		var y = d3.scale.linear().domain([0, d3.max(this.data)]).range([0 + this.marginY, this.h - this.marginY]);
+		var y = d3.scale.linear().domain([0, d3.max(this.data)]).range([0 + this.marginY, this.h - this.marginY ]);
         var x = d3.scale.linear().domain([0, this.data.length-1]).range([0 + this.marginX, this.w - this.marginX]);
 		this.intervalX = (x(this.data.length-1)-this.marginX)/(this.data.length-1);
-		this.intervalY = y(d3.max(this.data))/(tricky+1);
+		this.intervalY = (y(d3.max(this.data))-this.marginY)/(tricky);
 		var percent = d3.scale.linear().domain([0, d3.max(this.data)]).range([0, 100]);
         var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("cardinal");
 
 		g.append("svg:rect").attr("x", 0).attr("y", -1 * this.h).attr("width", this.w).attr("height", this.h).attr("fill","white");
 		
-        for (var j = 0; j < 11; j++) {
-            g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j).attr("x2", x(this.data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
-        	g.append("svg:text").attr("class","yLabel").text(j*10).attr("x",0).attr("y", -1 * (this.intervalY * j) - marginy ).attr("text-anchor", "right").attr("dy", 3);
+        for (var j = 0; j < 11; j+=2) {
+            g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j ).attr("x2", x(this.data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j ).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
+        	g.append("svg:text").attr("class","yLabel").text(j*10 + "%").attr("x",0 + Math.ceil((10-j)/9)*7).attr("y", -1 * (this.intervalY * j) - marginy).attr("text-anchor", "left").attr("dy", 3).attr("direction", "rtl");
         }
 	
 		g.append("svg:path").attr("d", line(this.data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
-        g.append("svg:line").attr("x1", x(0)).attr("y1", (-1 * y(0))).attr("x2", x(this.w)).attr("y2", (-1 * y(0))).attr("stroke", "#000").attr("stroke-width", 2);
-        g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0)).attr("x2", x(0)).attr("y2", -1 * y(d3.max(this.data))-marginy).attr("stroke", "#000").attr("stroke-width", 2);
+        //g.append("svg:line").attr("x1", x(0)).attr("y1", (-1 * y(0))).attr("x2", x(this.w)).attr("y2", (-1 * y(0))).attr("stroke", "#000").attr("stroke-width", 2);
+        //g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0)).attr("x2", x(0)).attr("y2", -1 * y(d3.max(this.data))-marginy).attr("stroke", "#000").attr("stroke-width", 2);
 
-		for (var i = 0; i < 24; i+=1) {
+		for (var i = 0; i < 25; i+=6) {
+	        var positionX = (Math.round((marginx + this.intervalX * i) * 100)) / 100;
 	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0)).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(d3.max(this.data))).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);
+         	g.append("svg:text").attr("class", "xLabel").text((i)+":00").attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
         }
 	
-        for (var i = 0; i < 24; i++) {
+        for (var i = 0; i < 25; i++) {
 	        var positionX = (Math.round((marginx + this.intervalX * i) * 100)) / 100;
-        	g.append("svg:text").attr("class", "xLabel").text((i+1)+":00").attr("x", positionX).attr("y", -5).attr("text-anchor", "middle");
-	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * this.data[i])-this.marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ this.data[i] +" hits  - "+ (percent(this.data[i])+0) +"%', 100);").attr('onmouseout',"tooltip.hide();");
+        	var tempPercent = (Math.round(percent(this.data[i]) * 100) / 100);
+	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * this.data[i])-this.marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ this.data[i] +" hits  - "+ tempPercent +"%', 100);").attr('onmouseout',"tooltip.hide();");
         }
 	};
 }
