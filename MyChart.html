@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html">
+﻿<!DOCTYPE "html">
 
 <html>
 <head>
@@ -14,9 +14,15 @@
 </head>
 <body>
 
-    <table width="980" >
+    <table nowrap="nowrap" width="980"  cellspacing="0">
         <tr>
-            <td style="width: 50%">
+            <td>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </td>
+            <td id="tdYear" class="labelSel" align="center" style="width: 100%">
+                <label id="LabelDate" style="font-weight: bold"></label>
+            </td>
+            <td>
                 &nbsp;
             </td>
             <td class="buttons">
@@ -24,109 +30,89 @@
                     <
                 </button> 
             </td>
-            <td id="tdDay" class="labelUnSel" style="width: 20px;">
-                <label id="LabelDay">3</label>
-            </td>
-            <td id="tdMonth" class="labelUnSel" style="width: 30px;">
-                <label id="LabelMonth">Aug</label>
-            </td>
-            <td id="tdYear" class="labelSel">
-                <label id="LabelYear">2011</label>
-            </td>
             <td class="buttons">
                 <button type="button" class="positive" onclick="next();"> 
                     >
                 </button> 
             </td>
-            <td style="width: 50%">
+            <td>
                 &nbsp;
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="btnDay();">
+                <button id="buttonDay" type="button" class="positive" onclick="btnDay();">
                     Day
                 </button>    
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="btnMonth();">
+                <button id="buttonMonth" type="button" class="positive" onclick="btnMonth();">
                     Month
                 </button>             
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button type="button" class="positive" onclick="btnYear();">
+                <button id="buttonYear" type="button" class="positive" onclick="btnYear();">
                     Year
                 </button>            
+            </td>
+            <td>
+                &nbsp;&nbsp;&nbsp;&nbsp;
             </td>
         </tr>
     </table>
 
     <script type="text/javascript" charset="utf-8">
     var actineStatus = 'year';
-    function next() {
+   	var month_name = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    var currentTime = new Date();
+    var day = currentTime.getDay();
+    var month = currentTime.getMonth();
+    var year = currentTime.getFullYear();
+
+    document.getElementById('LabelDate').textContent = year;
+    
+    var chart = new DateTimeChart(1000, 250, 40, 25,10);
+  	btnYear();   	
+   	
+   	function next() {
     	if(actineStatus == 'day') {
-           	var lbl = document.getElementById('LabelDay');
-    		var day = parseInt(lbl.textContent);
     		if(day < 31) {
     	    	btnDay();
-                lbl.textContent = day + 1;
+                document.getElementById('LabelDate').textContent = (++day) + " " + month_name[month]+" "+ year;
     		}	
     		
     	}
     	else if(actineStatus == 'month') {
-        	var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    		var lbl = document.getElementById('LabelMonth');
-    		var index = 0;
-    		for (var i = 0; i < months.length; i++) {
-    			if(months[i] == lbl.textContent) {
-    			    index = i;
-    				break;
-    			}
-    		}
-    		if(index < 11) {
+    		if(month < 11) {
     			btnMonth();
-    			lbl.textContent = months[index + 1];
+    			document.getElementById('LabelDate').textContent = month_name[++month] + " " + year;
     		}
 
     	}
     	else if(actineStatus == 'year') {
-           	var lbl = document.getElementById('LabelYear');
-    		var year = parseInt(lbl.textContent);
     		if(year < 2011) {
     			btnYear();
-    			lbl.textContent = year + 1;
+    			document.getElementById('LabelDate').textContent = ++year;
     		}
     	}
     }
     
     function previous() {
     	if(actineStatus == 'day') {
-           	var lbl = document.getElementById('LabelDay');
-    		var day = parseInt(lbl.textContent);
     		if(day > 1) {
     			btnDay();
-    			lbl.textContent = day - 1;
+                document.getElementById('LabelDate').textContent = (--day) + " " + month_name[month]+" "+ year;
     		}
     	}
     	else if(actineStatus == 'month') {
-        	var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    		var lbl = document.getElementById('LabelMonth');
-    		var index = 0;
-    		for (var i = 0; i < months.length; i++) {
-    			if(months[i]== lbl.textContent) {
-    			    index = i;
-    				break;
-    			}
-    		}
-    		if(index > 0) {
+    		if(month > 0) {    			
     			btnMonth();
-    			lbl.textContent = months[index - 1];    		
+    			document.getElementById('LabelDate').textContent = month_name[--month] + " " + year;
     		}
     	}
     	else if(actineStatus == 'year') {
-           	var lbl = document.getElementById('LabelYear');
-    		var year = parseInt(lbl.textContent);
     		if(year > 1990) {
     			btnYear();
-    			lbl.textContent = year - 1;
+    			document.getElementById('LabelDate').textContent = --year;
     		}
     	}
     }    
@@ -135,9 +121,10 @@
         var dataDayOriginal = new Array();
         randomGen(dataDayOriginal, 25);
     	chart.setDataDay(dataDayOriginal);
-    	document.getElementById('tdDay').className = 'labelSel';
-    	document.getElementById('tdMonth').className = 'labelUnSel';
-    	document.getElementById('tdYear').className = 'labelUnSel';
+    	document.getElementById('LabelDate').textContent = day + "  " +month_name[month] + "  " +year;
+    	document.getElementById('buttonDay').className = "Negative";
+    	document.getElementById('buttonMonth').className = "Positive";
+    	document.getElementById('buttonYear').className = "Positive";
     }
     
     function btnMonth() {
@@ -145,9 +132,10 @@
         var dataMonthOriginal = new Array();
         randomGen(dataMonthOriginal,31);
     	chart.setDataMonth(dataMonthOriginal);
-    	document.getElementById('tdDay').className = 'labelUnSel';
-    	document.getElementById('tdMonth').className = 'labelSel';
-    	document.getElementById('tdYear').className = 'labelUnSel';
+    	document.getElementById('LabelDate').textContent = month_name[month] + "  "+ year;
+    	document.getElementById('buttonDay').className = "Positive";
+    	document.getElementById('buttonMonth').className = "Negative";
+    	document.getElementById('buttonYear').className = "Positive";
     }
     
     function btnYear() {
@@ -155,81 +143,20 @@
     	var dataYearOriginal= new Array();
       	randomGen(dataYearOriginal, 12);
         chart.setDataYear(dataYearOriginal);
-    	document.getElementById('tdDay').className = 'labelUnSel';
-    	document.getElementById('tdMonth').className = 'labelUnSel';
-    	document.getElementById('tdYear').className = 'labelSel';
+    	document.getElementById('LabelDate').textContent = year;
+    	document.getElementById('buttonDay').className = "Positive";
+    	document.getElementById('buttonMonth').className = "Positive";
+    	document.getElementById('buttonYear').className = "Negative";
     }
     
-
-//      if(/msie/i.test(navigator.userAgent)) {
-//        alert("Sorry, Internet Explorer is not supported, please get a modern browser like Chrome of Firefox");
-//      }
-      //else {
-      //loadCSV('c:\analytics.csv?' + new Date().getTime());
-
-
+    function randomGen(array , count) {
+        for(var i=0;i<count;i++) {
+	        array[i] = Math.floor(Math.random() * 11);
+        };
+        array[2] = 10;
+        array[8] = 0;
+    }
       	
-        var chart = new DateTimeChart(1000, 250, 40, 25,10);
-      	btnYear();
-      //}
-
-      function randomGen(array , count) {
-      	for(var i=0;i<count;i++) {
-      		array[i] = Math.floor(Math.random() * 11);
-      	};
-      	array[2] = 10;
-      	array[8] = 0;
-      }
-      	
-//        function loadCSV(url)
-//        {
-//        	var src = "c:\analytics.csv";
-//        	var dest = "results.html"; // The names of our input and output files
-//        	// Create some variables
-//        	var fso, fin, fout;
-//        	var data = new Array();
-//        	// Define constants for file access
-//        	var forReading = 1;
-//        	var forWriting = 2;
-//        	var forAppending = 8;
-//        	// Create File System Object and open input and output files
-//        	fso = new ActiveXObject("Scripting.FileSystemObject");
-//        	fin = fso.OpenTextFile(src, forReading);
-//        	fout = fso.OpenTextFile(dest, forWriting, true);
-//            // Write out header and start of tablef
-//            out.WriteLine( htmlHeader() );
-//            fout.WriteLine( "<table border='0' cellpadding='1' cellspacing='0' width='100%'>" );
-//            // Loop through entire file
-//            while( !fin.AtEndOfStream )
-//            { 
-//            try
-//             {  
-//            // Read the next line 
-//             var line = fin.ReadLine();  
-//              // If line if blank - skip it  
-//            if( line == "" )   
-//             continue;
-//            data = line.split( "," );
-//            fout.WriteLine( "<tr>" );
-//            for( i = 0; i < data.length; i++ )
-//              { 
-//            fout.WriteLine( "<td>" + data[i] + "</td>" );
-//              }
-//            fout.WriteLine( "</tr>\r\n" );
-//             }
-//            catch( e ) 
-//            {  
-//            WScript.Echo( "Error: " + e.description ); 
-//            }
-//            }
-//            fout.WriteLine( "</table>" );
-//            // Close HTML 
-//            fout.WriteLine( htmlFooter() );
-//            // Close input and output file
-//            fin.Close();
-//            fout.Close();
-//         }
-
         
     </script>
 
