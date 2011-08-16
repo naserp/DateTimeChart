@@ -1,26 +1,30 @@
 ﻿<!DOCTYPE "html">
-
 <html>
 <head>
     <title>DateTimeChart d3</title>
-    
     <style type="text/css" media="screen">
-        text {font-family: Arial;font-size: 9pt;}
+        text
+        {
+            font-family: Arial;
+            font-size: 9pt;
+        }
     </style>
-    
     <link href="Style.css" rel="stylesheet" type="text/css" />
-    <script src="d3.js" type="text/javascript"></script>
-    <script src="DateTimeChart.js" type="text/javascript"></script>    
-</head>
-<body>
 
-    <table nowrap="nowrap" width="980"  cellspacing="0">
+    <script src="d3.js" type="text/javascript"></script>
+
+    <script src="DateTimeChart.js" type="text/javascript"></script>
+
+</head>
+<body onkeypress="return keypressed(event);">
+    <table nowrap="nowrap" width="980" cellspacing="0">
         <tr>
             <td>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </td>
             <td id="tdYear" class="labelSel" align="center" style="width: 100%">
-                <label id="LabelDate" style="font-weight: bold"></label>
+                <label id="LabelDate" style="font-weight: bold">
+                </label>
             </td>
             <td>
                 &nbsp;
@@ -28,12 +32,12 @@
             <td class="buttons">
                 <button type="button" class="positive" onclick="previous();">
                     <
-                </button> 
+                </button>
             </td>
             <td class="buttons">
-                <button type="button" class="positive" onclick="next();"> 
+                <button type="button" class="positive" onclick="next();">
                     >
-                </button> 
+                </button>
             </td>
             <td>
                 &nbsp;
@@ -41,21 +45,35 @@
             <td class="buttons" nowrap="nowrap">
                 <button id="buttonDay" type="button" class="positive" onclick="btnDay();">
                     Day
-                </button>    
+                </button>
             </td>
             <td class="buttons" nowrap="nowrap">
                 <button id="buttonMonth" type="button" class="positive" onclick="btnMonth();">
                     Month
-                </button>             
+                </button>
             </td>
             <td class="buttons" nowrap="nowrap">
-                <button id="buttonYear" type="button" class="positive" onclick="btnYear();">
+                <button id="buttonYear" type="button" class="positive" onclick="btnYear(currentyearpage);">
                     Year
-                </button>            
+                </button>
             </td>
             <td>
                 &nbsp;&nbsp;&nbsp;&nbsp;
             </td>
+        </tr>
+        <tr>
+            <td>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </td>        
+            <td class="buttons">
+                <button type="button" class="positive" onclick="previousStep();">
+                    <-
+                </button>
+                <button type="button" class="positive" onclick="nextStep();">
+                    ->
+                </button>
+            </td>
+
         </tr>
     </table>
 
@@ -67,18 +85,108 @@
     var day = currentTime.getDay();
     var month = currentTime.getMonth();
     var year = currentTime.getFullYear();
+ 
+    function myObj(y,m,d,th,tm,v) {
+      this.year = y;
+      this.month = m;
+      this.day = d;
+      this.hour = th;
+      this.minute = tm;
+      this.value = v;
+    }
+    var valuelist = new Array();
+    var valuelistYear = new Array();
+    var valuelistYearN = new Array();
+    var valuelistMonth = new Array();
+    var valuelistDay = new Array();
 
-    document.getElementById('LabelDate').textContent = year;
+    var yearXLabels = new Array();
+    
+    
+    var minyear = 0;
+    var maxyear = 0;
+    var maxyearpage = 0;
+    var currentyearpage = 0;
+    var ystep = 0;
+    
+    randomGen2(valuelist, 500);
+    districtArray(valuelist, 500);
+    normalize(valuelistYearN);
+    
+    function randomGen2(array , count) {
+        for(var i=0;i<count;i++) {
+        	var tempyear = 2005 + Math.floor(Math.random() * 4);
+        	var tempmonth = Math.floor(Math.random() * 12);
+        	var tempday = Math.floor(Math.random() * 31);
+        	var temphour = Math.floor(Math.random() * 24);
+        	var tempminute = Math.floor(Math.random() * 60);
+        	var tempvalue = Math.floor(Math.random() * 11);
+	        array[i] = new myObj(tempyear,tempmonth,tempday,temphour,tempminute,tempvalue);
+        };
+    }
+    
+    function normalize(array) {
+    	var max = 0;
+    	for(var j=0; j<array.length;j++) {
+    		if(array[j].value > max)
+    			max = array[j].value;
+    	}
+    	for(var i=0; i< array.length;i++) {
+    		var temp = (array[i].value * 10) / max;
+    		array[i].value = Math.round(temp *1000)/1000;
+    	}
+    }    
+    
+    function districtArray(array , count) {
+    	
+    	array.sort(function(a, b) {
+    		return b.month - a.month;
+    	});
+    	array.sort(function(a, b) {
+    		return b.year - a.year;
+    	});
+    	maxyear = array[0].year;
+    	year = maxyear;
+    	var index = 0;
+    	var lastyear = maxyear + 1;
+    	for(var i=0; i<count;i++) {
+    		if(array[i].year == lastyear){
+    			for(var k= (maxyearpage-1)*12 ; k<= (maxyearpage*12-1);k++) {
+    				if(valuelistYear[k].month == array[i].month) {
+    					valuelistYear[k].value += array[i].value;
+    					valuelistYearN[k].value += array[i].value;
+    					break;
+    				}
+    			}
+    	    }
+    		else{
+    			maxyearpage++;
+    			i--;
+    			lastyear--;
+    			for(var j=11; j>=0 ; j-- ) {
+    				valuelistYear[index] = new myObj(lastyear, j ,0,0,0,0);
+    				valuelistYearN[index++] = new myObj(lastyear, j ,0,0,0,0);
+    		    }	
+    	    }
+    	}
+    	minyear = lastyear;
+    }
     
     var chart = new DateTimeChart(1000, 250, 40, 25,10);
-  	btnYear();   	
+    currentyearpage = 1;
+    btnYear(currentyearpage);   	
    	
-   	function next() {
+   	function nextStep() {
     	if(actineStatus == 'day') {
     		if(day < 31) {
     	    	btnDay();
                 document.getElementById('LabelDate').textContent = (++day) + " " + month_name[month]+" "+ year;
-    		}	
+    		}
+    		else {
+    			day = 1;
+    	    	btnDay();
+                document.getElementById('LabelDate').textContent = (day) + " " + month_name[++month]+" "+ year;
+    		}
     		
     	}
     	else if(actineStatus == 'month') {
@@ -86,21 +194,38 @@
     			btnMonth();
     			document.getElementById('LabelDate').textContent = month_name[++month] + " " + year;
     		}
+    		else {
+    			month = 0;
+    			btnMonth();
+    			document.getElementById('LabelDate').textContent = month_name[month] + " " + (++year);
+    		}
 
     	}
     	else if(actineStatus == 'year') {
-    		if(year < 2011) {
-    			btnYear();
-    			document.getElementById('LabelDate').textContent = ++year;
+    		var bound = (currentyearpage-1) * 12 + ystep;
+    		if(bound > 0) 
+    		{
+    			ystep--;
+    			if(ystep == -1) {
+    				currentyearpage--;
+    				year++;
+    				ystep = 11;
+    			}
+    			btnYear(currentyearpage);
     		}
     	}
     }
     
-    function previous() {
+    function previousStep() {
     	if(actineStatus == 'day') {
     		if(day > 1) {
     			btnDay();
                 document.getElementById('LabelDate').textContent = (--day) + " " + month_name[month]+" "+ year;
+    		}
+    		else {
+    			day = 31;
+    	    	btnDay();
+                document.getElementById('LabelDate').textContent = (day) + " " + month_name[--month]+" "+ year;
     		}
     	}
     	else if(actineStatus == 'month') {
@@ -108,14 +233,28 @@
     			btnMonth();
     			document.getElementById('LabelDate').textContent = month_name[--month] + " " + year;
     		}
+    		else {
+    			month = 11;
+    			btnMonth();
+    			document.getElementById('LabelDate').textContent = month_name[month] + " " + (--year);    			
+    		}
     	}
     	else if(actineStatus == 'year') {
-    		if(year > 1990) {
-    			btnYear();
-    			document.getElementById('LabelDate').textContent = --year;
+    		var bound = (currentyearpage-1) * 12 + ystep;
+    		if(bound < (currentyearpage*12)) 
+    		{
+    			ystep++;
+    			if(ystep == 12) {
+    				currentyearpage++;
+    				year--;
+    				ystep = 0;
+    			}
+    			btnYear(currentyearpage);
     		}
     	}
     }    
+    
+    
     function btnDay() {
     	actineStatus = 'day';
         var dataDayOriginal = new Array();
@@ -138,17 +277,104 @@
     	document.getElementById('buttonYear').className = "Positive";
     }
     
-    function btnYear() {
+    function btnYear(ypage) {
     	actineStatus = 'year';
-    	var dataYearOriginal= new Array();
-      	randomGen(dataYearOriginal, 12);
-        chart.setDataYear(dataYearOriginal);
-    	document.getElementById('LabelDate').textContent = year;
+    	var dataYear= new Array();
+    	var dataYearNorm = new Array();
+    	var index = 0;
+    	for(var i=(12 * ypage -1); i>=(12 * (ypage-1)); i--) {
+    		dataYear[index] = valuelistYear[i+ystep].value;
+    		dataYearNorm[index++] = valuelistYearN[i+ystep].value;
+    	}
+    	
+    	var indexlabel = 12-ystep;
+    	for(var j=0; j<12 ;j++) {
+    		if(indexlabel >= 12)
+    			indexlabel = 0;
+    		yearXLabels[j] = month_name[indexlabel++];
+    	}
+        chart.setDataYear(dataYearNorm,dataYear,yearXLabels,ystep,ypage);
+    	
+    	if(ystep == 0 || ystep == 12 )
+    	    document.getElementById('LabelDate').textContent = year;
+    	else {
+    		document.getElementById('LabelDate').textContent = (year-1) + ' - '+ year;
+    	}
     	document.getElementById('buttonDay').className = "Positive";
     	document.getElementById('buttonMonth').className = "Positive";
     	document.getElementById('buttonYear').className = "Negative";
+    }  	
+  	
+   	function next() {
+    	if(actineStatus == 'day') {
+    		if(day < 31) {
+    	    	btnDay();
+                document.getElementById('LabelDate').textContent = (++day) + " " + month_name[month]+" "+ year;
+    		}
+    		else {
+    			day = 1;
+    	    	btnDay();
+                document.getElementById('LabelDate').textContent = (day) + " " + month_name[++month]+" "+ year;
+    		}
+    		
+    	}
+    	else if(actineStatus == 'month') {
+    		if(month < 11) {
+    			btnMonth();
+    			document.getElementById('LabelDate').textContent = month_name[++month] + " " + year;
+    		}
+    		else {
+    			month = 0;
+    			btnMonth();
+    			document.getElementById('LabelDate').textContent = month_name[month] + " " + (++year);
+    		}
+
+    	}
+    	else if(actineStatus == 'year') {
+    		if(year < maxyear) {
+    			ystep = 0;
+    			currentyearpage--;
+    			year++;
+    			btnYear(currentyearpage);    			
+    		}
+    	}
     }
     
+    function previous() {
+    	if(actineStatus == 'day') {
+    		if(day > 1) {
+    			btnDay();
+                document.getElementById('LabelDate').textContent = (--day) + " " + month_name[month]+" "+ year;
+    		}
+    		else {
+    			day = 31;
+    	    	btnDay();
+                document.getElementById('LabelDate').textContent = (day) + " " + month_name[--month]+" "+ year;
+    		}
+    	}
+    	else if(actineStatus == 'month') {
+    		if(month > 0) {    			
+    			btnMonth();
+    			document.getElementById('LabelDate').textContent = month_name[--month] + " " + year;
+    		}
+    		else {
+    			month = 11;
+    			btnMonth();
+    			document.getElementById('LabelDate').textContent = month_name[month] + " " + (--year);    			
+    		}
+    	}
+    	else if(actineStatus == 'year') {
+    		if(year > minyear) {
+    			ystep = 0;
+    		    currentyearpage++;
+    			year--;
+    			btnYear(currentyearpage);
+    		}
+    	}
+    }   
+    
+ 
+       
     function randomGen(array , count) {
         for(var i=0;i<count;i++) {
 	        array[i] = Math.floor(Math.random() * 11);
@@ -156,8 +382,49 @@
         array[2] = 10;
         array[8] = 0;
     }
-      	
-        
+    
+    function keypressed(event) {
+        var key;
+        if (event.keyCode)
+            key = event.keyCode;
+        else
+            key = event.which;
+        if (key == 39) {
+        	next();
+            return false;
+        } else 
+        if (key == 37) {
+        	previous();
+            return false;
+        }else 
+        if (key == 38) {
+    	    if(actineStatus == 'day') {
+    	    	btnMonth();
+    	    }
+    	    else if(actineStatus == 'month') {
+    	    	btnYear();
+    	    }
+    	    else if(actineStatus == 'year') {
+    	    	btnDay();
+    	    }
+            return false;
+        }else 
+        if (key == 40) {
+    	    if(actineStatus == 'day') {
+    	    	btnYear();
+    	    }
+    	    else if(actineStatus == 'month') {
+                btnDay();
+    	    }
+    	    else if(actineStatus == 'year') {
+    	    	btnMonth();
+    	    }
+            return false;
+        }
+        return true;
+    }
+       
+   
     </script>
 
 </body>
