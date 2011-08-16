@@ -109,13 +109,13 @@
     var currentyearpage = 0;
     var ystep = 0;
     
-    randomGen2(valuelist, 500);
-    districtArray(valuelist, 500);
+    randomGen2(valuelist, 1000);
+    districtArray(valuelist, 1000);
     normalize(valuelistYearN);
     
     function randomGen2(array , count) {
         for(var i=0;i<count;i++) {
-        	var tempyear = 2005 + Math.floor(Math.random() * 4);
+        	var tempyear = 2005 + Math.floor(Math.random() * 7);
         	var tempmonth = Math.floor(Math.random() * 12);
         	var tempday = Math.floor(Math.random() * 31);
         	var temphour = Math.floor(Math.random() * 24);
