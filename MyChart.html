@@ -3,6 +3,7 @@
 <head>
     <title>DateTimeChart d3</title>
 
+    <!--Add these three link to your head of your page-->
     <link href="Style.css" rel="stylesheet" type="text/css" />
     <script src="d3.js" type="text/javascript"></script>
     <script src="DateTimeChart.js" type="text/javascript"></script>
@@ -14,7 +15,7 @@
     <div id="DateChart"></div>
     
     <script type="text/javascript">
-	    //Data Generator and creat a list of dateObj as valueList
+	    //Data Generator which creat a list of dateObj as valueList , creat your own valueList in thsi format 
 	    var valueList = new Array();
 	    for(var i=0;i<500;i++) {
     	    var tempYear = 2008 + Math.floor(Math.random() * 3);
@@ -26,6 +27,7 @@
             valueList[i] = new dateObj(tempYear,tempMonth,tempDay,tempHour,tempMinute,tempValue);
         }
 	    
+	    //define the chart , passing the name of your DIV and the list of your data and draw the year view
         var chart = new DateTimeChart("DateChart",valueList);
         chart.btnYear();        
     </script>
