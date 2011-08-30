@@ -17,11 +17,11 @@
     <script type="text/javascript">
 	    //Data Generator which creat a list of dateObj as valueList , creat your own valueList in thsi format 
 	    var valueList = new Array();
-	    for(var i=0;i<500;i++) {
+	    for(var i=0;i<1000;i++) {
     	    var tempYear = 2008 + Math.floor(Math.random() * 3);
     	    var tempMonth = Math.floor(Math.random() * 12);
     	    var tempDay = Math.floor(Math.random() * 31);
-    	    var tempHour = Math.floor(Math.random() * 24);
+    	    var tempHour = Math.floor(Math.random() * 23);
     	    var tempMinute = Math.floor(Math.random() * 60);
     	    var tempValue = Math.floor(Math.random() * 11);
             valueList[i] = new dateObj(tempYear,tempMonth,tempDay,tempHour,tempMinute,tempValue);

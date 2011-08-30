@@ -7,7 +7,7 @@
 		+"<td id='tdYear' class='labelSel' align='center' style='width: 100%'><label id='LabelDate' style='font-weight: bold'></label></td><td>&nbsp;</td><td class='buttons'>"
         +"<button type='button' class='positive' onclick='chart.previous();'> < </button></td>"
         +"<td class='buttons'><button type='button' class='positive' onclick='chart.next();'> > </button> </td>"
-	    +"<td>&nbsp;</td><td class='buttons' nowrap='nowrap'><button id='buttonDay' type='button' class='positive'>Day</button></td>"
+	    +"<td>&nbsp;</td><td class='buttons' nowrap='nowrap'><button id='buttonDay' type='button' class='positive' onclick='chart.btnDay();'>Day</button></td>"
 	    +"<td class='buttons' nowrap='nowrap'><button id='buttonMonth' type='button' class='positive' onclick='chart.btnMonth();'>Month</button></td>"
 	    +"<td class='buttons' nowrap='nowrap'><button id='buttonYear' type='button' class='positive' onclick='chart.btnYear();'>Year</button></td>"
 	    +"<td>&nbsp;&nbsp;&nbsp;&nbsp;</td></tr></table>"
@@ -48,20 +48,49 @@
     var maxmonthpage = 0;
     this.currentmonthpage = 1;
     var mstep = 0;
-    
+
+    var maxday = 0;
+    var maxdaypage = 0;
+    this.currentdaypage = 1;
+    var dstep = 0;
+	
    	var vis = d3.select('#canvas').append("svg:svg").attr("width", w).attr("height", h);
     var g = vis.append("svg:g").attr("transform", "translate(0, "+h+")");
 
     districtArray(valuelist);
     normalize(valuelistYearN);
     normalize(valuelistMonthN);
+    normalize(valuelistDayN);
 	
 	this.btnDay = function() {
 		activeStatus = 'day';
-		var dataDayOriginal = new Array();
-		randomGen(dataDayOriginal, 25);
-		chart.setDataDay(dataDayOriginal);
-		document.getElementById('LabelDate').textContent = day + "  " + monthName[month] + "  " + year;
+		myIntervalX = 35;
+		var dataDay = new Array();
+		var dataDayNorm = new Array();
+		var index = 0;
+		for (var i = (this.currentdaypage * 24 - 1); i >= (this.currentdaypage - 1) * 24; i--) {
+			dataDay[index] = valuelistDay[i + dstep].value;
+			dataDayNorm[index++] = valuelistDayN[i + dstep].value;
+		}
+		var indexlabel = 24 - dstep;
+
+		for (var j = 0; j < 5; j++) {
+			if (indexlabel >= 24)
+				indexlabel = ((indexlabel) % 6);
+			dayXLabels[j] = indexlabel;
+			indexlabel += 6;
+		}
+		paintDay(dataDayNorm, dataDay, dayXLabels, dstep, this.currentdaypage);
+		
+		if (dstep == 0 || dstep == 24)
+			document.getElementById('LabelDate').textContent = day + " " +monthName[month] + " " + year;
+		else {
+			document.getElementById('LabelDate').textContent = (day-1) + "-" + day +" "+monthName[month] + " " + year;
+		if(day == 1)
+		    document.getElementById('LabelDate').textContent = "31 " + monthName[month-1] + " " + (year) + " - " + day +" "+ monthName[month] + " " + year;				
+		if(day == 1 && month==0)
+		    document.getElementById('LabelDate').textContent = "31 " + monthName[11] + " " + (year-1) + " - " + day +" "+ monthName[month] + " " + year;				
+		}
 		document.getElementById('buttonDay').className = "Negative";
 		document.getElementById('buttonMonth').className = "Positive";
 		document.getElementById('buttonYear').className = "Positive";
@@ -86,18 +115,19 @@
 			indexlabel += 3;
 		}
 		paintMonth(dataMonthNorm, dataMonth, monthXLabels, mstep, this.currentmonthpage);
-		
 		if (mstep == 0 || mstep == 31)
 			document.getElementById('LabelDate').textContent = monthName[month] + " " + year;
 		else {
-			document.getElementById('LabelDate').textContent = monthName[month - 1] + " - " + monthName[month] + " " + year;
+			document.getElementById('LabelDate').textContent = monthName[month - 1] + "-" + monthName[month] + "   " + year;
+			if(month==0)
+			    document.getElementById('LabelDate').textContent = monthName[11] + " " +(year-1) + " - " + monthName[month] + "   " + year;
 		}
 		document.getElementById('buttonDay').className = "Positive";
 		document.getElementById('buttonMonth').className = "Negative";
 		document.getElementById('buttonYear').className = "Positive";
 	};
 
-	this.btnYear = function() {
+	this.btnYear = function() {//alert("btnYear");
 		activeStatus = 'year';
 		myIntervalX = 83;
 		var dataYear = new Array();
@@ -127,52 +157,69 @@
 	};
 
 	this.next = function() {
-		if (activeStatus == 'day') {
-			if (day < 31) {
-				btnDay();
-				document.getElementById('LabelDate').textContent = (++day) + " " + monthName[month] + " " + year;
-			}
-			else {
-				day = 1;
-				btnDay();
-				document.getElementById('LabelDate').textContent = (day) + " " + monthName[++month] + " " + year;
-			}
 
+		if (activeStatus == 'day') {
+			dstep = 0;
+			if (this.currentdaypage > 1) {
+				day++;
+				this.currentdaypage--;
+				if (day >= 32) {
+					day = 1;
+    				this.currentmonthpage--;
+					month++;
+					if(month >= 12) {
+						month = 0;
+	    				this.currentyearpage--;
+    					year++;
+					}
+				}
+       			this.btnDay();
+			}
 		}
 		else if (activeStatus == 'month') {
 			mstep = 0;
-			if (this.currentmonthpage > 0) {
+			if (this.currentmonthpage > 1) {
 				month++;
 				this.currentmonthpage--;
+				this.currentdaypage -= 31;
 				if (month >= 12) {
 					month = 0;
+    				this.currentyearpage--;
 					year++;
 				}
+    			this.btnMonth();			
 			}
-			this.btnMonth();
-
 		}
 		else if (activeStatus == 'year') {
 			ystep = 0;
 			if (year < maxyear) {
 				this.currentyearpage--;
+				this.currentmonthpage -= 12;
+				this.currentdaypage -= 372;
 				year++;
+        		this.btnYear();
 			}
-    		this.btnYear();
-			
 		}
 	};
 
-	this.previous = function() {
+	this.previous = function() {   
+
 		if (activeStatus == 'day') {
-			if (day > 1) {
-				btnDay();
-				document.getElementById('LabelDate').textContent = (--day) + " " + monthName[month] + " " + year;
-			}
-			else {
-				day = 31;
-				btnDay();
-				document.getElementById('LabelDate').textContent = (day) + " " + monthName[--month] + " " + year;
+			dstep = 0;
+			if (this.currentdaypage < maxdaypage) {
+				day--;
+				this.currentdaypage++;
+				if (day <= 0) {
+					day = 31;
+				    this.currentmonthpage++;					
+					month--;
+					if(month<0) {
+						month = 11;
+						this.currentyearpage++;
+						year--;
+					}
+				}
+		        this.btnDay();					
 			}
 		}
 		else if (activeStatus == 'month') {
@@ -180,8 +227,10 @@
 			if (this.currentmonthpage < maxmonthpage) {
 				month--;
 				this.currentmonthpage++;
+				this.currentdaypage += 31;
 				if (month < 0) {
 					month = 11;
+					this.currentyearpage++;
 					year--;
 				}
 			}
@@ -191,26 +240,42 @@
 			ystep = 0;
 			if (year > minyear) {
 				this.currentyearpage++;
+				this.currentmonthpage += 12;
+				this.currentdaypage += 372;
 				year--;
+				this.btnYear();
 			}
-			this.btnYear();
 		}
 	};
 
 	this.nextStep = function() {
-//		if (activeStatus == 'day') {
-//			if (day < 31) {
-//				btnDay();
-//				document.getElementById('LabelDate').textContent = (++day) + " " + monthName[month] + " " + year;
-//			}
-//			else {
-//				day = 1;
-//				btnDay();
-//				document.getElementById('LabelDate').textContent = (day) + " " + monthName[++month] + " " + year;
-//			}
-
-//		}
-//		else
+		if (activeStatus == 'day') {
+			var bound = (this.currentdaypage - 1) * 23 + dstep;
+			if (bound > 0)
+			{
+				dstep--;
+				if (dstep == -1) {
+					this.currentdaypage--;
+					day++;
+				    if (day >= 32) {
+					    day = 1;
+    				    this.currentmonthpage--;
+					    month++;
+					    if(month >= 12) {
+						    month = 0;
+	    				    this.currentyearpage--;
+    					    year++;
+					    }
+				    }					
+					dstep = 22;
+				}
+				this.btnDay();
+			}
+			else {
+				this.dragStop();
+			}
+		}
+		else
 		 if (activeStatus == 'month') {
 			var bound = (this.currentmonthpage - 1) * 31 + mstep;
 			if (bound > 0)
@@ -218,7 +283,13 @@
 				mstep--;
 				if (mstep == -1) {
 					this.currentmonthpage--;
+					this.currentdaypage-=31;
 					month++;
+				    if (month >= 12) {
+					    month = 0;
+    				    this.currentyearpage--;
+					    year++;
+				    }					
 					mstep = 30;
 				}
 				this.btnMonth();
@@ -234,6 +305,8 @@
 				ystep--;
 				if (ystep == -1) {
 					this.currentyearpage--;
+					this.currentmonthpage -= 12;
+					this.currentdaypage -= 372;
 					year++;
 					ystep = 11;
 				}
@@ -246,18 +319,33 @@
 	};
 
 	this.previousStep = function() {
-//		if (activeStatus == 'day') {
-//			if (day > 1) {
-//				btnDay();
-//				document.getElementById('LabelDate').textContent = (--day) + " " + monthName[month] + " " + year;
-//			}
-//			else {
-//				day = 31;
-//				btnDay();
-//				document.getElementById('LabelDate').textContent = (day) + " " + monthName[--month] + " " + year;
-//			}
-//		}
-//		else
+		if (activeStatus == 'day') {
+			var bound = (this.currentdaypage - 1) * 23 + mstep;
+			if (bound < (this.currentdaypage * 23) && this.currentdaypage < maxdaypage)
+			{
+				dstep++;
+				if (dstep >= 23) {
+					this.currentdaypage++;
+					day--;
+				    if (day <= 0) {
+					    day = 31;
+				        this.currentmonthpage++;					
+					    month--;
+					    if(month<0) {
+						    month = 11;
+						    this.currentyearpage++;
+						    year--;
+					    }
+				    }					
+					dstep = 0;
+				}
+				this.btnDay();
+			}
+			else {
+				this.dragStop();
+			}
+		}
+		else
 		if (activeStatus == 'month') {
 			var bound = (this.currentmonthpage - 1) * 31 + mstep;
 			if (bound < (this.currentmonthpage * 31) && this.currentmonthpage < maxmonthpage)
@@ -265,7 +353,13 @@
 				mstep++;
 				if (mstep >= 31) {
 					this.currentmonthpage++;
+					this.currentdaypage+=31;
 					month--;
+				    if (month < 0) {
+					    month = 11;
+					    this.currentyearpage++;
+					    year--;
+				    }					
 					mstep = 0;
 				}
 				this.btnMonth();
@@ -281,6 +375,8 @@
 				ystep++;
 				if (ystep == 12) {
 					this.currentyearpage++;
+					this.currentmonthpage+= 12;
+					this.currentdaypage+= 372;
 					year--;
 					ystep = 0;
 				}
@@ -291,17 +387,7 @@
 			}
 		}
 	};    
-    
-  
-  
-    function randomGen(array , count) {
-        for(var i=0;i<count;i++) {
-	        array[i] = Math.floor(Math.random() * 11);
-        };
-        array[2] = 10;
-        array[8] = 0;
-    }
-  
+ 
 	function districtArray(array) {
     	array.sort(function(a, b) {
     		return b.minute - a.minute;
@@ -329,6 +415,10 @@
     	var indexMonth = 0;
     	var lastmonth = maxmonth + 1;
 
+    	maxday = 32;
+    	day = maxday-1;	    	
+    	var indexDay = 0;
+    	var lastday = maxday + 1;		
     	
     	for(var i=0; i<array.length;i++) {
     		if(array[i].year == lastyear){
@@ -339,6 +429,10 @@
     			var tempmonthindex = Math.abs((array[i].day) - 30) + (tempyearindex) * 31;
     			valuelistMonth[tempmonthindex].value += array[i].value; 
     			valuelistMonthN[tempmonthindex].value += array[i].value;
+    			
+    			var tempdayindex = Math.abs((array[i].hour) - 23) + (tempmonthindex) * 24;
+    			valuelistDay[tempdayindex].value += array[i].value; 
+    			valuelistDayN[tempdayindex].value += array[i].value;
     	    }
     		else{
     			maxyearpage++;
@@ -347,10 +441,15 @@
     			for(var y=11; y>=0 ; y-- ) {
     				valuelistYear[indexYear] = new dateObj(lastyear, y ,0,0,0,0);
     				valuelistYearN[indexYear++] = new dateObj(lastyear, y ,0,0,0,0);
+    				maxmonthpage++;
     				for(var m=30; m>=0 ; m-- ) {
-    					maxmonthpage++;
     				    valuelistMonth[indexMonth] = new dateObj(lastyear, y ,m,0,0,0);
     				    valuelistMonthN[indexMonth++] = new dateObj(lastyear, y ,m,0,0,0);
+    					maxdaypage++;
+    					for(var d=23 ; d>= 0; d--) {    						
+    				        valuelistDay[indexDay] = new dateObj(lastyear, y ,m,d,0,0);
+    				        valuelistDayN[indexDay++] = new dateObj(lastyear, y ,m,d,0,0);
+    				    }
     		        }
     		    }	
     	    }
@@ -400,7 +499,6 @@
 
 		dragObj.elNode.style.zIndex = ++dragObj.zIndex;
 
-//		document.addEventListener("mousemove", this.dragGo, true);
 		document.addEventListener("mouseup", this.dragStop, true);
 		event.preventDefault();
 
@@ -438,12 +536,13 @@
 		
 	}
 	
-    function paintYear(data, dataOrigin, axisLabels, yearStep, yearPage) {removeSVG();
+    function paintYear(data, dataOrigin, axisLabels, yearStep, yearPage) {
+    	removeSVG();
 		var y = d3.scale.linear().domain([0, 10]).range([0 + marginY, h - marginY]);
         var x = d3.scale.linear().domain([0, data.length-1]).range([0 + marginX, w - marginX]);
 		this.intervalX = (x(data.length-1)- marginX)/(data.length-1);
 		this.intervalY = (y(10)- marginY)/(trickY);
-        var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("cardinal");
+        var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("monotone");
 
     	g.append("svg:rect").attr("x", 0).attr("y", -1 * h).attr("width", w).attr("height", h).attr("fill","white");
 
@@ -483,12 +582,13 @@
         }
 	};		
 
-	 function paintMonth(data, dataOrigin, axisLabels, monthStep, monthPage) {removeSVG();
+	 function paintMonth(data, dataOrigin, axisLabels, monthStep, monthPage) {
+	 	removeSVG();
 		var y = d3.scale.linear().domain([0, 10]).range([0 + marginY, h - marginY]);
         var x = d3.scale.linear().domain([0, data.length-1]).range([0 + marginX, w - marginX]);
 		this.intervalX = (x(data.length-1)-marginX)/(data.length-1);
 		this.intervalY = (y(10)-marginY)/(trickY);
-        var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("cardinal");
+        var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("monotone");
         
 		g.append("svg:rect").attr("x", 0).attr("y", -1 * h).attr("width", w).attr("height", h).attr("fill","white");
 		
@@ -504,8 +604,8 @@
 	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0) +10).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(10)).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1).attr("stroke-dasharray", 2);
         	g.append("svg:text").attr("class", "xLabel").text(axisLabels[i/3]).attr("x", positionX).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
         }
-	
-    	var indexlabel = monthStep;
+	    	
+	 	var indexlabel = monthStep;
     	var sw = monthPage % 2;
     	var color;
     	if(sw == 0)
@@ -528,41 +628,54 @@
         	var tempPercent = (Math.round(data[i] * 1000) / 100);
 	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ dataOrigin[i] +" hits - "+ (tempPercent) +"%', 100);").attr('onmouseout',"tooltip.hide();");
         }
-
 	};
 
-    function setDataDay(d) {
-		this.data = d;
-		this.paintDay();
-	};
 
-	function paintDay() {
-		var y = d3.scale.linear().domain([0, d3.max(this.data)]).range([0 + this.marginY, this.h - this.marginY ]);
-        var x = d3.scale.linear().domain([0, this.data.length-1]).range([0 + this.marginX, this.w - this.marginX]);
-		this.intervalX = (x(this.data.length-1)-this.marginX)/(this.data.length-1);
-		this.intervalY = (y(d3.max(this.data))-this.marginY)/(trickY);
-		var percent = d3.scale.linear().domain([0, d3.max(this.data)]).range([0, 100]);
-        var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("cardinal");
+	function paintDay(data, dataOrigin, axisLabels, dayStep, dayPage) {
+		removeSVG();
+		var y = d3.scale.linear().domain([0, 10]).range([0 + marginY, h - marginY ]);
+        var x = d3.scale.linear().domain([0, data.length-1]).range([0 + marginX, w - marginX]);
+		this.intervalX = (x(data.length-1)-marginX)/(data.length-1);
+		this.intervalY = (y(10)-marginY)/(trickY);
+        var line = d3.svg.line().x(function(d, i) { return x(i); }).y(function(d) { return -1 * y(d); }).interpolate("monotone");
 
-		g.append("svg:rect").attr("x", 0).attr("y", -1 * this.h).attr("width", this.w).attr("height", this.h).attr("fill","white");
+		g.append("svg:rect").attr("x", 0).attr("y", -1 * h).attr("width", w).attr("height", h).attr("fill","white");
 		
         for (var j = 0; j < 11; j+=2) {
-            g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j ).attr("x2", x(this.data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j ).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
+            g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j ).attr("x2", x(data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j ).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
         	g.append("svg:text").attr("class","yLabel").text(j*10 + "%").attr("x",0 + Math.ceil((10-j)/9)*7).attr("y", -1 * (this.intervalY * j) - marginY).attr("text-anchor", "left").attr("dy", 3).attr("direction", "rtl");
         }
 	
-		g.append("svg:path").attr("d", line(this.data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
+		g.append("svg:path").attr("d", line(data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
 
-		for (var i = 0; i < 25; i+=6) {
+		for (var i = 0; i < 24; i+=6) {
 	        var positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
-	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0)+10).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(d3.max(this.data))).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);
-         	g.append("svg:text").attr("class", "xLabel").text((i)+":00").attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
+	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0)+10).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(10)).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1).attr("stroke-dasharray", 2);
+         	g.append("svg:text").attr("class", "xLabel").text((axisLabels[i/6])+":00").attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
         }
-	
-        for (var i = 0; i < 25; i++) {
-	        var positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
-        	var tempPercent = (Math.round(percent(this.data[i]) * 100) / 100);
-	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * this.data[i])-this.marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ this.data[i] +" hits  - "+ tempPercent +"%', 100);").attr('onmouseout',"tooltip.hide();");
+
+    	var indexlabel = dayStep;
+    	var sw = dayPage % 2;
+    	var color;
+    	if(sw == 0)
+    		color = "steelblue";
+    	else 
+    		color = "none";
+    	for (var i = 0; i < 24; i+=6) {
+    		if(i >= indexlabel) {
+    	        if(sw == 0)
+    		        color = "none";
+    	        else 
+    		        color = "steelblue";
+    		}
+    		positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
+	        g.append("svg:rect").attr("class", "xRect").attr("x", positionX - 15 ).attr("y", -1 * y(0)+8).attr("width", 30).attr("height", 16).attr("rx", 5).attr("fill", color).attr("stroke", "blue").attr("stroke-width", .5).attr("fill-opacity", .3);
+    	}
+		
+        for (var i = 0; i < 24; i++) {
+	        positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
+        	var tempPercent = (Math.round((data[i]) * 1000) / 100);
+	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ dataOrigin[i] +" hits  - "+ tempPercent +"%', 100);").attr('onmouseout',"tooltip.hide();");
         }
 	};
 }
@@ -575,7 +688,6 @@ function dateObj(y,m,d,th,tm,v) {
   this.minute = tm;
   this.value = v;
 }
-
 
 var tooltip = function(){
     var id = 'tt';
