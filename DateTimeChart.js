@@ -35,10 +35,13 @@
     var valuelistDayN = new Array();
 
     var yearXLabels = new Array();
+    var yearYLabels = [0,20,40,60,80,100];
     var monthXLabels = new Array();
+    var monthYLabels = [0,20,40,60,80,100];
     var dayXLabels = new Array();
-    
-    var minyear = 0;
+    var dayYLabels = [0,20,40,60,80,100];
+
+	var minyear = 0;
     var maxyear = 0;
     var maxyearpage = 0;
     this.currentyearpage = 1;
@@ -48,7 +51,7 @@
     var maxmonthpage = 0;
     this.currentmonthpage = 1;
     var mstep = 0;
-
+	
     var maxday = 0;
     var maxdaypage = 0;
     this.currentdaypage = 1;
@@ -58,9 +61,9 @@
     var g = vis.append("svg:g").attr("transform", "translate(0, "+h+")");
 
     districtArray(valuelist);
-    normalize(valuelistYearN);
-    normalize(valuelistMonthN);
-    normalize(valuelistDayN);
+    normalize(valuelistYearN,yearYLabels);
+    normalize(valuelistMonthN,monthYLabels);
+    normalize(valuelistDayN,dayYLabels);
 	
 	this.btnDay = function() {
 		activeStatus = 'day';
@@ -80,7 +83,7 @@
 			dayXLabels[j] = indexlabel;
 			indexlabel += 6;
 		}
-		paintDay(dataDayNorm, dataDay, dayXLabels, dstep, this.currentdaypage);
+		paintDay(dataDayNorm, dataDay, dayXLabels, dayYLabels, dstep, this.currentdaypage);
 		
 		if (dstep == 0 || dstep == 24)
 			document.getElementById('LabelDate').textContent = day + " " +monthName[month] + " " + year;
@@ -114,7 +117,7 @@
 			monthXLabels[j] = indexlabel;
 			indexlabel += 3;
 		}
-		paintMonth(dataMonthNorm, dataMonth, monthXLabels, mstep, this.currentmonthpage);
+		paintMonth(dataMonthNorm, dataMonth, monthXLabels, monthYLabels, mstep, this.currentmonthpage);
 		if (mstep == 0 || mstep == 31)
 			document.getElementById('LabelDate').textContent = monthName[month] + " " + year;
 		else {
@@ -127,7 +130,7 @@
 		document.getElementById('buttonYear').className = "Positive";
 	};
 
-	this.btnYear = function() {//alert("btnYear");
+	this.btnYear = function() {
 		activeStatus = 'year';
 		myIntervalX = 83;
 		var dataYear = new Array();
@@ -144,7 +147,7 @@
 				indexlabel = 0;
 			yearXLabels[j] = monthName[indexlabel++];
 		}
-		paintYear(dataYearNorm, dataYear, yearXLabels, ystep, this.currentyearpage);
+		paintYear(dataYearNorm, dataYear, yearXLabels, yearYLabels, ystep, this.currentyearpage);
 
 		if (ystep == 0 || ystep == 12)
 			document.getElementById('LabelDate').textContent = year;
@@ -422,11 +425,11 @@
     	
     	for(var i=0; i<array.length;i++) {
     		if(array[i].year == lastyear){
-    			var tempyearindex = Math.abs((array[i].month) - 11) + (maxyearpage-1)*12; 
+    			var tempyearindex = Math.abs((array[i].month-1) - 11) + (maxyearpage-1)*12; 
     			valuelistYear[tempyearindex].value += array[i].value; 
     			valuelistYearN[tempyearindex].value += array[i].value;
 
-    			var tempmonthindex = Math.abs((array[i].day) - 30) + (tempyearindex) * 31;
+    			var tempmonthindex = Math.abs((array[i].day-1) - 30) + (tempyearindex) * 31;
     			valuelistMonth[tempmonthindex].value += array[i].value; 
     			valuelistMonthN[tempmonthindex].value += array[i].value;
     			
@@ -457,15 +460,23 @@
     	minyear = lastyear;
     }
     
-    function normalize(array) {
-    	var max = 0;
+    function normalize(array , labels) {
+    	var max =  0;
+    	var min =  0;
+    	
     	for(var j=0; j<array.length;j++) {
     		if(array[j].value > max)
     			max = array[j].value;
+    		if(array[j].value < min)
+    			min = array[j].value;
     	}
     	for(var i=0; i< array.length;i++) {
-    		var temp = (array[i].value * 10) / max;
-    		array[i].value = Math.round(temp *1000)/1000;
+    		var change = d3.scale.linear().domain([min , max]).range([0,10]);
+    		array[i].value = Math.round(change(array[i].value) *1000)/1000;
+    	}
+    	for (var k = 0; k <= 5; k++) {
+    		var temp = min + (k * ((max - min) / 5));
+    		labels[k] = Math.round(temp*10)/10;
     	}
     } 	
     
@@ -536,7 +547,7 @@
 		
 	}
 	
-    function paintYear(data, dataOrigin, axisLabels, yearStep, yearPage) {
+    function paintYear(data, dataOrigin, xAxisLabels, yAxisLabels, yearStep, yearPage) {
     	removeSVG();
 		var y = d3.scale.linear().domain([0, 10]).range([0 + marginY, h - marginY]);
         var x = d3.scale.linear().domain([0, data.length-1]).range([0 + marginX, w - marginX]);
@@ -548,7 +559,7 @@
 
         for (var j = 0; j < 11; j+=2) {
             g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j).attr("x2", x(data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
-        	g.append("svg:text").attr("class","yLabel").text(j*10 + "%").attr("x",0 + Math.ceil((10-j)/9)*7).attr("y", -1 * (this.intervalY * j) - marginY ).attr("text-anchor", "right").attr("dy", 3);
+        	g.append("svg:text").attr("class","yLabel").text(yAxisLabels[j/2]).attr("x", marginX - 10).attr("y", -1 * (this.intervalY * j) - marginY ).attr("text-anchor", "end").attr("dy", 3);
         }
     	
 		g.append("svg:path").attr("d", line(data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
@@ -577,12 +588,12 @@
     	for (var i = 0; i < 12; i++) {
         	positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
         	var tempPercent = (Math.round((data[i]) * 1000) / 100);
-   	        g.append("svg:text").attr("class", "xLabel").text(axisLabels[i]).attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
-        	g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show('"+ dataOrigin[i] +" hits - "+ tempPercent +"%', 100);").attr('onmouseout',"tooltip.hide();");
+   	        g.append("svg:text").attr("class", "xLabel").text(xAxisLabels[i]).attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
+        	g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show('Value:  "+ dataOrigin[i] +" $', 100);").attr('onmouseout',"tooltip.hide();");
         }
 	};		
 
-	 function paintMonth(data, dataOrigin, axisLabels, monthStep, monthPage) {
+	 function paintMonth(data, dataOrigin, xAxisLabels, yAxisLabels, monthStep, monthPage) {
 	 	removeSVG();
 		var y = d3.scale.linear().domain([0, 10]).range([0 + marginY, h - marginY]);
         var x = d3.scale.linear().domain([0, data.length-1]).range([0 + marginX, w - marginX]);
@@ -594,7 +605,7 @@
 		
         for (var j = 0; j < 31; j+=2) {
             g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j).attr("x2", x(data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
-        	g.append("svg:text").attr("class","yLabel").text(j*10 + "%").attr("x",0+ Math.ceil((10-j)/9)*7).attr("y", -1 * (this.intervalY * j) - marginY ).attr("text-anchor", "right").attr("dy", 3);
+        	g.append("svg:text").attr("class","yLabel").text(yAxisLabels[j/2]).attr("x" , marginX - 10).attr("y", -1 * (this.intervalY * j) - marginY ).attr("text-anchor", "end").attr("dy", 3);
         }
 		
 		g.append("svg:path").attr("d", line(data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
@@ -602,7 +613,7 @@
 		for (var i = 0; i < 31; i+=3) {
             var positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
 	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0) +10).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(10)).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1).attr("stroke-dasharray", 2);
-        	g.append("svg:text").attr("class", "xLabel").text(axisLabels[i/3]).attr("x", positionX).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
+        	g.append("svg:text").attr("class", "xLabel").text(xAxisLabels[i/3]).attr("x", positionX).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
         }
 	    	
 	 	var indexlabel = monthStep;
@@ -626,12 +637,12 @@
         for (var i = 0; i < 31; i++) {
 	        positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
         	var tempPercent = (Math.round(data[i] * 1000) / 100);
-	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ dataOrigin[i] +" hits - "+ (tempPercent) +"%', 100);").attr('onmouseout',"tooltip.hide();");
+	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show('Value:  "+ dataOrigin[i] +" $', 100);").attr('onmouseout',"tooltip.hide();");
         }
 	};
 
 
-	function paintDay(data, dataOrigin, axisLabels, dayStep, dayPage) {
+	function paintDay(data, dataOrigin, xAxisLabels, yAxisLabels, dayStep, dayPage) {
 		removeSVG();
 		var y = d3.scale.linear().domain([0, 10]).range([0 + marginY, h - marginY ]);
         var x = d3.scale.linear().domain([0, data.length-1]).range([0 + marginX, w - marginX]);
@@ -643,7 +654,7 @@
 		
         for (var j = 0; j < 11; j+=2) {
             g.append("svg:line").attr("x1", x(0)).attr("y1", -1 * y(0) - this.intervalY*j ).attr("x2", x(data.length-1)).attr("y2", -1 * y(0)-this.intervalY*j ).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1);        	
-        	g.append("svg:text").attr("class","yLabel").text(j*10 + "%").attr("x",0 + Math.ceil((10-j)/9)*7).attr("y", -1 * (this.intervalY * j) - marginY).attr("text-anchor", "left").attr("dy", 3).attr("direction", "rtl");
+        	g.append("svg:text").attr("class","yLabel").text(yAxisLabels[j/2]).attr("x",marginX - 10).attr("y", -1 * (this.intervalY * j) - marginY).attr("text-anchor", "end").attr("dy", 3);
         }
 	
 		g.append("svg:path").attr("d", line(data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
@@ -651,7 +662,7 @@
 		for (var i = 0; i < 24; i+=6) {
 	        var positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
 	        g.append("svg:line").attr("x1", x(0)+(this.intervalX*i)).attr("y1", -1 * y(0)+10).attr("x2", x(0)+(this.intervalX*i)).attr("y2", -1 * y(10)).attr("fill-opacity", .1).attr("stroke", "#ddd").attr("stroke-width", 1).attr("stroke-dasharray", 2);
-         	g.append("svg:text").attr("class", "xLabel").text((axisLabels[i/6])+":00").attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
+         	g.append("svg:text").attr("class", "xLabel").text((xAxisLabels[i/6])+":00").attr("x", positionX ).attr("y", -1 * y(0) + 20).attr("text-anchor", "middle");
         }
 
     	var indexlabel = dayStep;
@@ -675,7 +686,7 @@
         for (var i = 0; i < 24; i++) {
 	        positionX = (Math.round((marginX + this.intervalX * i) * 100)) / 100;
         	var tempPercent = (Math.round((data[i]) * 1000) / 100);
-	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show(' "+ dataOrigin[i] +" hits  - "+ tempPercent +"%', 100);").attr('onmouseout',"tooltip.hide();");
+	        g.append("svg:circle").attr("class", "little").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show('Value: "+ dataOrigin[i] +" $', 100);").attr('onmouseout',"tooltip.hide();");
         }
 	};
 }
