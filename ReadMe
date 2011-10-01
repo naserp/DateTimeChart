@@ -1,3 +1,2 @@
 DateTimeChart is a javascript class.
-open MyChart.html in a browser except IE. It seems that d3 has a problem with IE in this class, 
-I am working on this problem to solve it. 
+ 
