@@ -2,13 +2,10 @@
 
 	var mainDiv = document.getElementById(MainDivId);
 
-
-
-
 	var w = 1000;
 	var h = 250;
 	var marginX = 0;
-	var marginY = 25;
+	var marginY = 45;
 	var trickY = 10;
 	
 	var activeStatus = 'year';
@@ -159,10 +156,11 @@
 		
 		paintYear(dataYearNorm, dataYear, yearXLabels, yearYLabels, ystep, currentyearpage);
 
-		if (ystep == 0 || ystep == 12){
-			document.getElementById('LabelDate').textContent = year;
+		if (ystep <6){
+			//document.getElementById('LabelDate').textContent = year;
+			document.getElementById('YearLabel').textContent = year;
 		}else {
-			document.getElementById('LabelDate').textContent = (year - 1) + " - " + year;
+			document.getElementById('YearLabel').textContent = (year - 1);
 		}
 //    	document.getElementById('buttonDay').className = "Positive";
 //		document.getElementById('buttonMonth').className = "Positive";
@@ -504,10 +502,10 @@
     	for(i=0 ; i<array.length;i++) {
     		arrayValue[i] = array[(array.length-1) - i].value;
     	}
-    	
+    	var inter = Math.ceil(((max - min) / 5));
+    	var begin = Math.floor(min) - 1;
     	for (var k = 0; k <= 5; k++) {
-    		var temp = min + (k * ((max - min) / 5));
-    		labels[k] = Math.round(temp*10)/10;
+    		labels[k] = begin + inter*k;
     	}
     } 	
     
@@ -605,7 +603,7 @@
 		mainDiv.innerHTML += "<div id='canvas' style='position:relative;' onmousedown='chart.dragStart(chart, event,&quot;canvas&quot;);' onmousemove='chart.dragGo(chart,event)'></div>";
 	    mainDiv.innerHTML += "<style type='text/css' media='screen'>text{font-family: Arial;font-size: 8pt;}</style>"
 			+ "<table nowrap='nowrap' width='1000' cellspacing='0' cellpadding='2'><tr class='labelSel'>"
-				+ "<td id='tdYear'  align='center' style='width: 100%'><label id='LabelDate' style='font-weight: bold'></label></td><td>&nbsp;</td><td class='buttons'>"
+//				+ "<td id='tdYear'  align='center' style='width: 100%'><label id='LabelDate' style='font-weight: bold'></label></td><td>&nbsp;</td><td class='buttons'>"
 //					+ "<button type='button' class='positive' onclick='chart.previous();'> < </button></td>"
 //						+ "<td class='buttons'><button type='button' class='positive' onclick='chart.next();'> > </button> </td>"
 //							+ "<td>&nbsp;</td><td class='buttons' nowrap='nowrap'><button id='buttonDay' type='button' class='positive' onclick='chart.btnDay();'>Day</button></td>"
@@ -658,7 +656,6 @@
         
     	g.append("svg:clipPath").attr("id", "rectClipLabelRight")
 	    	.append("svg:rect").attr("x", w -(marginX+myIntervalX)-marginX -53).attr("y", -1 * h).attr("width",myIntervalX+marginX+3).attr("height", h);
-    	
 		var y = d3.scale.linear().domain([0, 10]).range([ marginY, h -10]);
         var x = d3.scale.linear().domain([0, data.length-1]).range([0 + marginX, w - marginX]);
 		this.intervalX = (x(data.length-1)- marginX)/(data.length-1);
@@ -674,19 +671,19 @@
     	
     	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX - 53).attr("y", -1 * h).attr("width", myIntervalX+marginX+3).attr("height", h).attr("fill-opacity", .1).attr("fill", "gray");
     	
-    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 65).attr("width", 50).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "#529214").attr("fill-opacity", .5).attr('onclick',"chart.btnYear();").attr("onmouseover","this.style.cursor='pointer ';");
+    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 65).attr("width", 50).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "gray").attr("fill-opacity", .5).attr('onclick',"chart.btnYear();").attr("onmouseover","this.style.cursor='pointer ';");
     	g.append("svg:text").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").text("Year").attr("x", w - (marginX + myIntervalX) - marginX -16).attr("y", -1 * h + 79).attr("text-anchor", "middle").attr("fill","white").attr('onclick',"chart.btnYear();").attr("onmouseover","this.style.cursor='pointer ';");
 
-    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 90).attr("width", 50).attr("height", 20).attr("rx", 5).attr("ry", 5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "#529214").attr("fill-opacity", .5).attr("onmouseover", "this.style.cursor='pointer ';");//.attr('onclick',"chart.btnMonth();")
+    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 90).attr("width", 50).attr("height", 20).attr("rx", 5).attr("ry", 5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "gray").attr("fill-opacity", .5).attr("onmouseover", "this.style.cursor='pointer ';");//.attr('onclick',"chart.btnMonth();")
     	g.append("svg:text").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").text("Month").attr("x", w - (marginX + myIntervalX) - marginX -16).attr("y", -1 * h + 104).attr("text-anchor", "middle").attr("fill","white").attr("onmouseover","this.style.cursor='pointer ';");//.attr('onclick',"chart.btnMonth();");
     	
-    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 115).attr("width", 50).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "#529214").attr("fill-opacity", .5).attr("onmouseover","this.style.cursor='pointer ';");//.attr('onclick',"chart.btnDay();");
+    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 115).attr("width", 50).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "gray").attr("fill-opacity", .5).attr("onmouseover","this.style.cursor='pointer ';");//.attr('onclick',"chart.btnDay();");
     	g.append("svg:text").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").text("Day").attr("x", w - (marginX + myIntervalX) - marginX -16).attr("y", -1 * h + 129).attr("text-anchor", "middle").attr("fill","white").attr("onmouseover","this.style.cursor='pointer ';");//.attr('onclick',"chart.btnDay();");
 
-    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 140).attr("width", 22).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "#529214").attr("fill-opacity", .5).attr('onclick',"chart.previous();").attr("onmouseover","this.style.cursor='pointer ';");
+    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -40).attr("y", -1 * h + 140).attr("width", 22).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "gray").attr("fill-opacity", .5).attr('onclick',"chart.previous();").attr("onmouseover","this.style.cursor='pointer ';");
     	g.append("svg:text").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").text("<").attr("x", w - (marginX + myIntervalX) - marginX -29).attr("y", -1 * h + 154).attr("text-anchor", "middle").attr("fill","white").attr('onclick',"chart.previous();").attr("onmouseover","this.style.cursor='pointer ';");
 
-    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -13).attr("y", -1 * h + 140).attr("width", 22).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "#529214").attr("fill-opacity", .5).attr('onclick',"chart.next();").attr("onmouseover","this.style.cursor='pointer ';");
+    	g.append("svg:rect").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").attr("x", w - (marginX + myIntervalX) - marginX -13).attr("y", -1 * h + 140).attr("width", 22).attr("height", 20).attr("rx",5).attr("ry",5).attr("stroke", "gray").attr("stroke-width", 1).attr("fill", "gray").attr("fill-opacity", .5).attr('onclick',"chart.next();").attr("onmouseover","this.style.cursor='pointer ';");
     	g.append("svg:text").attr("transform", "translate(" + (50 - cursorDifrention) + " ,0)").attr("clip-path", "url(#rectClipLabelRight)").text(">").attr("x", w - (marginX + myIntervalX) - marginX -3).attr("y", -1 * h + 154).attr("text-anchor", "middle").attr("fill","white").attr('onclick',"chart.next();").attr("onmouseover","this.style.cursor='pointer ';");
 
 		g.append("svg:path").attr("clip-path", "url(#rectClip)").attr("d", line(data)).attr("stroke","steelblue").attr("stroke-width", 2).attr("fill", "none");
@@ -718,6 +715,15 @@
     		var tempData = (Math.round((dataOrigin[i]) * 1000) / 1000);    		
         	g.append("svg:circle").attr("class", "little").attr("clip-path", "url(#rectClip)").attr("cx", positionX).attr("cy", (-1 * (this.intervalY) * data[i])-marginY).attr("r", 4).attr("fill", "steelblue").attr('onmouseover',"tooltip.show('Value:  "+ tempData +" $', 100);").attr('onmouseout',"tooltip.hide();");
     	}
+		if(ystep<6)
+			tempGap = ystep + 6;
+		else {
+			tempGap = ystep - 6;
+		}
+    	g.append("svg:rect").attr("class", "xRect").attr("clip-path", "url(#rectClip)").attr("x", (tempGap)*this.intervalX).attr("y", -1 * y(0)+24).attr("width", this.intervalX).attr("height", 16).attr("rx", 5).attr("fill", "gray").attr("stroke", "gray").attr("stroke-width", 1).attr("fill-opacity", 1);    			   	
+    	g.append("svg:text").attr("id", "YearLabel").attr("clip-path", "url(#rectClip)").text(xAxisLabels[i]).attr("x", (tempGap)*this.intervalX +24 ).attr("y", -1 * y(0) +36).attr("text-anchor", "right").attr("fill","white");
+
+    	g.append("svg:line").attr("x1", x(0)-(marginX + myIntervalX)).attr("y1", -1 * y(0)+marginY-1).attr("x2", w+2*(marginX + myIntervalX)).attr("y2", -1 * y(0)+marginY-1).attr("fill-opacity", 1).attr("stroke", "gray").attr("stroke-width", 1);        	
     	
 	};
 	
